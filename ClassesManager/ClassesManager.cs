@@ -26,7 +26,7 @@ namespace ClassesManager {
         private static bool _useClassesFirstRound;
 
         public static CardCategory DefaultCardCategory;
-
+        
         public static Dictionary<string, CardCategory> ClassCategories;
         public static Dictionary<string, CardCategory> ClassUpgradeCategories;
 
