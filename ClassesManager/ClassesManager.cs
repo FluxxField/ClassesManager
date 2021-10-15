@@ -26,8 +26,8 @@ namespace ClassesManager {
         private static bool _useClassesFirstRound;
 
         public static CardCategory DefaultCardCategory;
+        public static CardCategory ClassCategory;
         
-        public static Dictionary<string, CardCategory> ClassCategories;
         public static Dictionary<string, CardCategory> ClassUpgradeCategories;
 
         private void Awake() {
@@ -40,6 +40,7 @@ namespace ClassesManager {
             
             if (CustomCardCategories.instance != null) {
                 DefaultCardCategory = CustomCardCategories.instance.CardCategory("defaultCard");
+                ClassCategory = CustomCardCategories.instance.CardCategory("class");
             }
             
             this.ExecuteAfterSeconds(0.4f, HandleBuildDefaultCategory);
@@ -52,6 +53,12 @@ namespace ClassesManager {
                 new[] {"FluxxField"},
                 new[] {"github"},
                 new[] {"https://github.com/FluxxField/ClassesManager"});
+        }
+
+        public static void AddClassUpgradeCategory(
+            string categoryName
+        ) {
+            ClassUpgradeCategories.Add(categoryName, CustomCardCategories.instance.CardCategory(categoryName));
         }
 
         private static void HandleBuildDefaultCategory() {
