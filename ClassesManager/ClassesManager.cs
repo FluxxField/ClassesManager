@@ -27,7 +27,7 @@ namespace ClassesManager {
 
         public static CardCategory DefaultCardCategory;
         public static CardCategory ClassCategory;
-        
+
         public static Dictionary<string, CardCategory> ClassUpgradeCategories;
 
         private void Awake() {
@@ -37,15 +37,15 @@ namespace ClassesManager {
 
         private void Start() {
             _useClassesFirstRound = _useClassesFirstRoundConfig.Value;
-            
+
             if (CustomCardCategories.instance != null) {
                 DefaultCardCategory = CustomCardCategories.instance.CardCategory("defaultCard");
                 ClassCategory = CustomCardCategories.instance.CardCategory("class");
             }
-            
+
             this.ExecuteAfterSeconds(0.4f, HandleBuildDefaultCategory);
 
-            GameModeManager.AddHook(GameModeHooks.HookGameStart, gm => ForceClassesFirstRound());
+            GameModeManager.AddHook(GameModeHooks.HookGameStart, gm => HandlePlayersBlacklistedCategories());
 
             Unbound.RegisterMenu(ModName, () => { }, NewGUI, null, false);
             Unbound.RegisterHandshake(ModId, OnHandShakeCompleted);
@@ -74,21 +74,23 @@ namespace ClassesManager {
             }
         }
 
-        private IEnumerator ForceClassesFirstRound() {
-            if (!_useClassesFirstRound) {
-                yield break;
+        private static IEnumerator HandlePlayersBlacklistedCategories() {
+            var players = PlayerManager.instance.players.ToArray();
+
+            foreach (var player in players) {
+                var blacklistCategories = CharacterStatModifiersExtension.GetAdditionalData(player.data.stats)
+                    .blacklistedCategories;
+
+                // Blacklist default cards if enabled by settings
+                if (_useClassesFirstRound) {
+                    blacklistCategories.Add(DefaultCardCategory);
+                }
+
+                // blacklist all upgrade categories
+                blacklistCategories.AddRange(ClassUpgradeCategories.Values.ToList());
             }
 
-            Player[] players = PlayerManager.instance.players.ToArray();
-
-            foreach (Player player in players) {
-                // Blacklist Default Cards and all Upgrade Cards for all players
-                CharacterStatModifiersExtension.GetAdditionalData(player.data.stats).blacklistedCategories.AddRange(
-                    new[] {
-                        DefaultCardCategory
-                    }
-                );
-            }
+            yield break;
         }
 
         private void NewGUI(
