@@ -27,8 +27,7 @@ namespace ClassesManager {
 
         public static CardCategory DefaultCardCategory;
         public static CardCategory ClassCategory;
-
-        public static Dictionary<string, CardCategory> ClassUpgradeCategories;
+        public static Dictionary<string, CardCategory> ClassUpgradeCategories = new Dictionary<string, CardCategory>();
 
         private void Awake() {
             _useClassesFirstRoundConfig =
