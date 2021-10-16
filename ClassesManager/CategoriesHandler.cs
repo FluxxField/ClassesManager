@@ -9,49 +9,25 @@ namespace ClassesManager {
         }
 
         public static CategoriesHandler Instance {
-            get {
-                if (_instance == null) {
-                    _instance = new CategoriesHandler();
-                }
-
-                return _instance;
-            }
+            get => _instance ?? new CategoriesHandler();
         }
 
         private Dictionary<string, CardCategory> _classUpgradeCategories;
         
         public  Dictionary<string, CardCategory> ClassUpgradeCategories {
-            get {
-                if (_classUpgradeCategories == null) {
-                    _classUpgradeCategories = new Dictionary<string, CardCategory>();
-                }
-
-                return _classUpgradeCategories;
-            }
+            get => _classUpgradeCategories ?? new Dictionary<string, CardCategory>();
         }
 
         private CardCategory _defaultCardCategory;
 
         public CardCategory DefaultCardCategory {
-            get {
-                if (_defaultCardCategory == null) {
-                    _defaultCardCategory = CustomCardCategories.instance.CardCategory("default");
-                }
-
-                return _defaultCardCategory;
-            }
+            get => _defaultCardCategory ?? CustomCardCategories.instance.CardCategory("default");
         }
         
         private CardCategory _classCategory;
 
         public CardCategory ClassCategory {
-            get {
-                if (_classCategory == null) {
-                    _classCategory = CustomCardCategories.instance.CardCategory("class");
-                }
-
-                return _classCategory;
-            }
+            get => _classCategory ?? CustomCardCategories.instance.CardCategory("class");
         }
         
         public void AddClassUpgradeCategory(

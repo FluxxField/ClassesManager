@@ -31,8 +31,6 @@ namespace ClassesManager {
         private void Start() {
             _useClassesFirstRound = _useClassesFirstRoundConfig.Value;
 
-            UnityEngine.Debug.Log(_useClassesFirstRound);
-
             this.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
 
             GameModeManager.AddHook(GameModeHooks.HookGameStart, gm => HandlePlayersBlacklistedCategories());
@@ -45,7 +43,7 @@ namespace ClassesManager {
                 new[] {"https://github.com/FluxxField/ClassesManager"});
         }
 
-        private void BuildDefaultCategory() {
+        private static void BuildDefaultCategory() {
             foreach (var currentCard in CardManager.cards.Values.ToList()) {
                 var currentCardsCategories = currentCard.cardInfo.categories.ToList();
                 
@@ -53,13 +51,8 @@ namespace ClassesManager {
                     return;
                 }
 
-                UnityEngine.Debug.Log($"{currentCard.cardInfo.cardName}");
-                UnityEngine.Debug.Log($"categories length before: {currentCardsCategories.Count}");
-
                 currentCardsCategories.Add(CategoriesHandler.Instance.DefaultCardCategory);
-                
-                UnityEngine.Debug.Log($"categories length after: {currentCardsCategories.Count}");
-                
+
                 currentCard.cardInfo.categories = currentCardsCategories.ToArray();
             }
         }
@@ -83,7 +76,7 @@ namespace ClassesManager {
             yield break;
         }
 
-        private void NewGUI(
+        private static void NewGUI(
             GameObject menu
         ) {
             MenuHandler.CreateText($"{ModName} Options", menu, out TextMeshProUGUI _);
@@ -94,7 +87,7 @@ namespace ClassesManager {
             });
         }
 
-        private void OnHandShakeCompleted() {
+        private static void OnHandShakeCompleted() {
             if (PhotonNetwork.IsMasterClient) {
                 NetworkingManager.RPC_Others(typeof(ClassesManager), nameof(SyncSettings),
                     new object[] {_useClassesFirstRound});
