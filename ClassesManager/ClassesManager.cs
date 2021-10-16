@@ -45,18 +45,18 @@ namespace ClassesManager {
                 new[] {"https://github.com/FluxxField/ClassesManager"});
         }
 
-        private static void BuildDefaultCategory() {
+        private void BuildDefaultCategory() {
             foreach (var currentCard in CardManager.cards.Values.ToList()) {
                 var currentCardsCategories = currentCard.cardInfo.categories.ToList();
                 
-                if (currentCardsCategories.Contains(CategoriesHandler.DefaultCardCategory)) {
+                if (currentCardsCategories.Contains(CategoriesHandler.Instance.DefaultCardCategory)) {
                     return;
                 }
 
                 UnityEngine.Debug.Log($"{currentCard.cardInfo.cardName}");
                 UnityEngine.Debug.Log($"categories length before: {currentCardsCategories.Count}");
 
-                currentCardsCategories.Add(CategoriesHandler.DefaultCardCategory);
+                currentCardsCategories.Add(CategoriesHandler.Instance.DefaultCardCategory);
                 
                 UnityEngine.Debug.Log($"categories length after: {currentCardsCategories.Count}");
                 
@@ -73,11 +73,11 @@ namespace ClassesManager {
 
                 // Blacklist default cards if enabled by settings
                 if (_useClassesFirstRound) {
-                    blacklistCategories.Add(CategoriesHandler.DefaultCardCategory);
+                    blacklistCategories.Add(CategoriesHandler.Instance.DefaultCardCategory);
                 }
 
                 // blacklist all upgrade categories
-                blacklistCategories.AddRange(CategoriesHandler.ClassUpgradeCategories.Values.ToList());
+                blacklistCategories.AddRange(CategoriesHandler.Instance.ClassUpgradeCategories.Values.ToList());
             }
 
             yield break;

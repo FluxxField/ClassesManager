@@ -18,9 +18,9 @@ namespace ClassesManager {
             }
         }
 
-        private static Dictionary<string, CardCategory> _classUpgradeCategories;
+        private Dictionary<string, CardCategory> _classUpgradeCategories;
         
-        public static  Dictionary<string, CardCategory> ClassUpgradeCategories {
+        public  Dictionary<string, CardCategory> ClassUpgradeCategories {
             get {
                 if (_classUpgradeCategories == null) {
                     _classUpgradeCategories = new Dictionary<string, CardCategory>();
@@ -30,9 +30,9 @@ namespace ClassesManager {
             }
         }
 
-        private static CardCategory _defaultCardCategory;
+        private CardCategory _defaultCardCategory;
 
-        public static CardCategory DefaultCardCategory {
+        public CardCategory DefaultCardCategory {
             get {
                 if (_defaultCardCategory == null) {
                     _defaultCardCategory = CustomCardCategories.instance.CardCategory("default");
@@ -42,9 +42,9 @@ namespace ClassesManager {
             }
         }
         
-        private static CardCategory _classCategory;
+        private CardCategory _classCategory;
 
-        public static CardCategory ClassCategory {
+        public CardCategory ClassCategory {
             get {
                 if (_classCategory == null) {
                     _classCategory = CustomCardCategories.instance.CardCategory("class");
@@ -54,7 +54,7 @@ namespace ClassesManager {
             }
         }
         
-        public static void AddClassUpgradeCategory(
+        public void AddClassUpgradeCategory(
             string categoryName
         ) {
             ClassUpgradeCategories.Add(categoryName, CustomCardCategories.instance.CardCategory(categoryName));
