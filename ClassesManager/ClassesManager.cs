@@ -1,9 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
-using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 using ModdingUtils.Extensions;
 using TMPro;
 using UnboundLib;
@@ -24,11 +22,7 @@ namespace ClassesManager {
 
         private static ConfigEntry<bool> _useClassesFirstRoundConfig;
         private static bool _useClassesFirstRound;
-
-        public static CardCategory DefaultCardCategory;
-        public static CardCategory ClassCategory;
-        public static Dictionary<string, CardCategory> ClassUpgradeCategories = new Dictionary<string, CardCategory>();
-
+        
         private void Awake() {
             _useClassesFirstRoundConfig =
                 Config.Bind("Classes Manager", "Enabled", false, "Enable classes only first round");
@@ -37,12 +31,9 @@ namespace ClassesManager {
         private void Start() {
             _useClassesFirstRound = _useClassesFirstRoundConfig.Value;
 
-            if (CustomCardCategories.instance != null) {
-                DefaultCardCategory = CustomCardCategories.instance.CardCategory("defaultCard");
-                ClassCategory = CustomCardCategories.instance.CardCategory("class");
-            }
+            UnityEngine.Debug.Log(_useClassesFirstRound);
 
-            this.ExecuteAfterSeconds(0.4f, HandleBuildDefaultCategory);
+            this.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
 
             GameModeManager.AddHook(GameModeHooks.HookGameStart, gm => HandlePlayersBlacklistedCategories());
 
@@ -54,22 +45,22 @@ namespace ClassesManager {
                 new[] {"https://github.com/FluxxField/ClassesManager"});
         }
 
-        public static void AddClassUpgradeCategory(
-            string categoryName
-        ) {
-            ClassUpgradeCategories.Add(categoryName, CustomCardCategories.instance.CardCategory(categoryName));
-        }
-
-        private static void HandleBuildDefaultCategory() {
-            foreach (Card currentCard in CardManager.cards.Values.ToList()) {
-                List<CardCategory> currentCategories = currentCard.cardInfo.categories.ToList();
-
-                if (currentCategories.Contains(DefaultCardCategory)) {
+        private static void BuildDefaultCategory() {
+            foreach (var currentCard in CardManager.cards.Values.ToList()) {
+                var currentCardsCategories = currentCard.cardInfo.categories.ToList();
+                
+                if (currentCardsCategories.Contains(CategoriesHandler.DefaultCardCategory)) {
                     return;
                 }
 
-                currentCategories.Add(DefaultCardCategory);
-                currentCard.cardInfo.categories = currentCategories.ToArray();
+                UnityEngine.Debug.Log($"{currentCard.cardInfo.cardName}");
+                UnityEngine.Debug.Log($"categories length before: {currentCardsCategories.Count}");
+
+                currentCardsCategories.Add(CategoriesHandler.DefaultCardCategory);
+                
+                UnityEngine.Debug.Log($"categories length after: {currentCardsCategories.Count}");
+                
+                currentCard.cardInfo.categories = currentCardsCategories.ToArray();
             }
         }
 
@@ -82,11 +73,11 @@ namespace ClassesManager {
 
                 // Blacklist default cards if enabled by settings
                 if (_useClassesFirstRound) {
-                    blacklistCategories.Add(DefaultCardCategory);
+                    blacklistCategories.Add(CategoriesHandler.DefaultCardCategory);
                 }
 
                 // blacklist all upgrade categories
-                blacklistCategories.AddRange(ClassUpgradeCategories.Values.ToList());
+                blacklistCategories.AddRange(CategoriesHandler.ClassUpgradeCategories.Values.ToList());
             }
 
             yield break;
@@ -97,8 +88,8 @@ namespace ClassesManager {
         ) {
             MenuHandler.CreateText($"{ModName} Options", menu, out TextMeshProUGUI _);
             MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateToggle(false, "Enable Force classes first round", menu, useClassesFirstRound => {
-                _useClassesFirstRound = useClassesFirstRound;
+            MenuHandler.CreateToggle(false, "Enable Force classes first round", menu, value => {
+                _useClassesFirstRound = value;
                 OnHandShakeCompleted();
             });
         }
