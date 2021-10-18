@@ -1,5 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using ModdingUtils.Extensions;
@@ -26,11 +29,30 @@ namespace ClassesManager {
         private static ConfigEntry<bool> _useClassesFirstRoundConfig;
         private static bool _isRoundOne = true;
 
+        private static List<CardInfo> ActiveCards {
+            get {
+                return ((ObservableCollection<CardInfo>)typeof(CardManager).GetField("activeCards", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null)).ToList();
+            }
+        }
+
+        private static List<CardInfo> InactiveCards {
+            get {
+                return (List<CardInfo>)typeof(CardManager).GetField("inactiveCards", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            }
+        }
+
+        internal static List<CardInfo> AllCards {
+            get {
+                return ActiveCards.Concat(InactiveCards).ToList();
+            }
+        }
+
+
         private void Start() {
             _useClassesFirstRoundConfig =
                 Config.Bind("Classes Manager", "Enabled", false, "Enable classes only first round");
-            
-            this.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
+
+            Unbound.Instance.ExecuteAfterSeconds(0.5f, BuildDefaultCategory);
 
             // Has to be at pick start since ModdingUtils has a hook that clears the players blacklistedCategories at game start
             GameModeManager.AddHook(GameModeHooks.HookPlayerPickStart, gm => HandlePlayersBlacklistedCategories());
@@ -45,17 +67,20 @@ namespace ClassesManager {
         }
 
         private static void BuildDefaultCategory() {
-            foreach (var currentCard in CardManager.cards.Values.ToList()) {
-                var currentCardsCategories = currentCard.cardInfo.categories.ToList();
+            UnityEngine.Debug.Log(AllCards.Count);
+            foreach (var currentCard in AllCards) {
+                UnityEngine.Debug.Log(currentCard.cardName);
+                
+                var currentCardsCategories = currentCard.categories.ToList();
 
                 if (currentCardsCategories.Contains(ClassesManager.Instance.DefaultCardCategory) ||
                     currentCardsCategories.Contains(ClassesManager.Instance.ClassCategory)) {
-                    return;
+                    continue;
                 }
 
                 currentCardsCategories.Add(ClassesManager.Instance.DefaultCardCategory);
 
-                currentCard.cardInfo.categories = currentCardsCategories.ToArray();
+                currentCard.categories = currentCardsCategories.ToArray();
             }
         }
 
@@ -74,7 +99,7 @@ namespace ClassesManager {
                     CharacterStatModifiersExtension.GetAdditionalData(player.data.stats).blacklistedCategories
                         .AddRange(ClassesManager.Instance.ClassUpgradeCategories.Values.ToList());
                 }
-                
+
                 _isRoundOne = false;
             }
 
@@ -91,10 +116,11 @@ namespace ClassesManager {
         ) {
             MenuHandler.CreateText($"{ModName} Options", menu, out TextMeshProUGUI _);
             MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateToggle(_useClassesFirstRoundConfig.Value, "Enable Force classes first round", menu, value => {
-                _useClassesFirstRoundConfig.Value = value;
-                OnHandShakeCompleted();
-            });
+            MenuHandler.CreateToggle(_useClassesFirstRoundConfig.Value, "Enable Force classes first round", menu,
+                value => {
+                    _useClassesFirstRoundConfig.Value = value;
+                    OnHandShakeCompleted();
+                });
         }
 
         private static void OnHandShakeCompleted() {
