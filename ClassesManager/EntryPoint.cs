@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
+using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 using ModdingUtils.Extensions;
 using TMPro;
 using UnboundLib;
@@ -67,14 +68,12 @@ namespace ClassesManager {
         }
 
         private static void BuildDefaultCategory() {
-            UnityEngine.Debug.Log(AllCards.Count);
             foreach (var currentCard in AllCards) {
-                UnityEngine.Debug.Log(currentCard.cardName);
-                
                 var currentCardsCategories = currentCard.categories.ToList();
 
                 if (currentCardsCategories.Contains(ClassesManager.Instance.DefaultCardCategory) ||
-                    currentCardsCategories.Contains(ClassesManager.Instance.ClassCategory)) {
+                    currentCardsCategories.Contains(ClassesManager.Instance.ClassCategory) || ClassesManager.Instance.ClassUpgradeCategories.Values.Any(category =>
+                        currentCardsCategories.Contains(category))) {
                     continue;
                 }
 
