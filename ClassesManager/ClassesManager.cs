@@ -52,5 +52,11 @@ namespace ClassesManager {
         public void RemoveDefaultCardCategoryFromPlayer(CharacterStatModifiers characterStats) {
             characterStats.GetAdditionalData().blacklistedCategories.Remove(DefaultCardCategory);
         }
+
+        public void AddClassCategoryToPlayersBlacklist(
+            CharacterStatModifiers characterStats
+        ) {
+            characterStats.GetAdditionalData().blacklistedCategories.Add(ClassCategory);
+        }
     }
 }
