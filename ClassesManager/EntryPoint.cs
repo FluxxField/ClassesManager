@@ -24,7 +24,7 @@ namespace ClassesManager {
     public class EntryPoint : BaseUnityPlugin {
         private const string ModId = "fluxxfield.rounds.plugins.classesmanager";
         private const string ModName = "Classes Manager";
-        private const string Version = "1.3.2";
+        private const string Version = "1.3.3";
 
         private static ConfigEntry<bool> _useClassesFirstRoundConfig;
         private static bool _isRoundOne = true;
