@@ -68,8 +68,15 @@ namespace ClassesManager {
                 return;
             }
 
-            var categoriesToRemove = ClassUpgradeCategories.Where(entry => upgradeCategoryNames.Contains(entry.Key)).Select(entry => entry.Value).ToList();
-            characterStats.GetAdditionalData().blacklistedCategories = (List<CardCategory>) characterStats.GetAdditionalData().blacklistedCategories.Except(categoriesToRemove);
+            var categoriesToRemove = new List<CardCategory>();
+
+            foreach (var upgradeCategoryName in upgradeCategoryNames) {
+                categoriesToRemove.Add(ClassUpgradeCategories[upgradeCategoryName]);
+            }
+
+            foreach (var category in categoriesToRemove) {
+                characterStats.GetAdditionalData().blacklistedCategories.Remove(category);
+            }
         }
 
         public void AddClassCategoryToPlayersBlacklist(
