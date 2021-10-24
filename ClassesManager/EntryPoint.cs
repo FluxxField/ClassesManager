@@ -41,7 +41,7 @@ namespace ClassesManager {
             }
         }
 
-        internal static List<CardInfo> AllCards {
+        private static List<CardInfo> AllCards {
             get {
                 return ActiveCards.Concat(InactiveCards).ToList();
             }
