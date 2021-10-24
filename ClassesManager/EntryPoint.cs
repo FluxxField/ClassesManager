@@ -52,11 +52,11 @@ namespace ClassesManager {
             _useClassesFirstRoundConfig =
                 Config.Bind("Classes Manager", "Enabled", false, "Enable classes only first round");
 
-            Unbound.Instance.ExecuteAfterSeconds(0.5f, BuildDefaultCategory);
+            Unbound.Instance.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
 
             // Has to be at pick start since ModdingUtils has a hook that clears the players blacklistedCategories at game start
-            GameModeManager.AddHook(GameModeHooks.HookPlayerPickStart, gm => HandlePlayersBlacklistedCategories());
-            GameModeManager.AddHook(GameModeHooks.HookGameEnd, gm => GameEndCleanup());
+            GameModeManager.AddHook(GameModeHooks.HookPickStart, HandlePlayersBlacklistedCategories);
+            GameModeManager.AddHook(GameModeHooks.HookGameStart, GameEndCleanup);
 
             Unbound.RegisterMenu(ModName, () => { }, NewGUI, null, false);
             Unbound.RegisterHandshake(ModId, OnHandShakeCompleted);
@@ -82,29 +82,29 @@ namespace ClassesManager {
             }
         }
 
-        private static IEnumerator HandlePlayersBlacklistedCategories() {
+        private static IEnumerator HandlePlayersBlacklistedCategories(IGameModeHandler gm) {
+            
             if (_isRoundOne) {
                 var players = PlayerManager.instance.players.ToArray();
+                _isRoundOne = false;
 
                 foreach (var player in players) {
+                    var blackListCategory = player.data.stats.GetAdditionalData().blacklistedCategories;
+                    
                     // Blacklist default cards if enabled by settings
                     if (_useClassesFirstRoundConfig.Value) {
-                        CharacterStatModifiersExtension.GetAdditionalData(player.data.stats).blacklistedCategories
-                            .Add(ClassesManager.Instance.DefaultCardCategory);
+                        blackListCategory.Add(ClassesManager.Instance.DefaultCardCategory);
                     }
 
                     // blacklist all upgrade categories
-                    CharacterStatModifiersExtension.GetAdditionalData(player.data.stats).blacklistedCategories
-                        .AddRange(ClassesManager.Instance.ClassUpgradeCategories.Values.ToList());
+                    blackListCategory.AddRange(ClassesManager.Instance.ClassUpgradeCategories.Values.ToList());
                 }
-
-                _isRoundOne = false;
             }
 
             yield break;
         }
 
-        private static IEnumerator GameEndCleanup() {
+        private static IEnumerator GameEndCleanup(IGameModeHandler gm) {
             _isRoundOne = true;
             yield break;
         }

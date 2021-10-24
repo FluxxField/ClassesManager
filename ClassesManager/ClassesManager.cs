@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CardChoiceSpawnUniqueCardPatch.CustomCategories;
 using ModdingUtils.Extensions;
 
@@ -30,7 +29,7 @@ namespace ClassesManager {
 
         public CardCategory DefaultCardCategory {
             get {
-                _defaultCardCategory = _defaultCardCategory ?? CustomCardCategories.instance.CardCategory("default");
+                _defaultCardCategory = _defaultCardCategory ?? CustomCardCategories.instance.CardCategory("Default");
                 return _defaultCardCategory;
             }
         }
@@ -39,7 +38,7 @@ namespace ClassesManager {
 
         public CardCategory ClassCategory {
             get {
-                _classCategory = _classCategory ?? CustomCardCategories.instance.CardCategory("class");
+                _classCategory = _classCategory ?? CustomCardCategories.instance.CardCategory("Class");
                 return _classCategory;
             }
         }
