@@ -26,7 +26,9 @@ namespace ClassesManager {
         private const string ModName = "Classes Manager";
         private const string Version = "1.3.3";
 
-        private static ConfigEntry<bool> _useClassesFirstRoundConfig;
+        private static ConfigEntry<bool> _forceClassesFirstRoundConfig;
+        private static ConfigEntry<bool> _allowMultiClassesConfig;
+
         private static bool _isRoundOne = true;
 
         private static List<CardInfo> ActiveCards {
@@ -49,14 +51,16 @@ namespace ClassesManager {
 
 
         private void Start() {
-            _useClassesFirstRoundConfig =
-                Config.Bind("Classes Manager", "Enabled", false, "Enable classes only first round");
-
+            _forceClassesFirstRoundConfig =
+                Config.Bind("Classes Manager", "Enabled", false, "Force classes only first round");
+            _allowMultiClassesConfig =
+                Config.Bind("Classes Manager", "Enabled", false, "Allow multiple classes per game");
+            
             Unbound.Instance.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
 
             // Has to be at pick start since ModdingUtils has a hook that clears the players blacklistedCategories at game start
             GameModeManager.AddHook(GameModeHooks.HookPickStart, HandlePlayersBlacklistedCategories);
-            GameModeManager.AddHook(GameModeHooks.HookGameStart, GameEndCleanup);
+            GameModeManager.AddHook(GameModeHooks.HookGameStart, GameStartCleanup);
 
             Unbound.RegisterMenu(ModName, () => { }, NewGUI, null, false);
             Unbound.RegisterHandshake(ModId, OnHandShakeCompleted);
@@ -83,7 +87,6 @@ namespace ClassesManager {
         }
 
         private static IEnumerator HandlePlayersBlacklistedCategories(IGameModeHandler gm) {
-            
             if (_isRoundOne) {
                 var players = PlayerManager.instance.players.ToArray();
                 _isRoundOne = false;
@@ -92,7 +95,7 @@ namespace ClassesManager {
                     var blackListCategory = player.data.stats.GetAdditionalData().blacklistedCategories;
                     
                     // Blacklist default cards if enabled by settings
-                    if (_useClassesFirstRoundConfig.Value) {
+                    if (_forceClassesFirstRoundConfig.Value) {
                         blackListCategory.Add(ClassesManager.Instance.DefaultCardCategory);
                     }
 
@@ -104,7 +107,8 @@ namespace ClassesManager {
             yield break;
         }
 
-        private static IEnumerator GameEndCleanup(IGameModeHandler gm) {
+        // Called before HandlePlayersBlacklistedCategories. Makes sure that _isRoundOne is true
+        private static IEnumerator GameStartCleanup(IGameModeHandler gm) {
             _isRoundOne = true;
             yield break;
         }
@@ -113,26 +117,36 @@ namespace ClassesManager {
             GameObject menu
         ) {
             MenuHandler.CreateText($"{ModName} Options", menu, out TextMeshProUGUI _);
-            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateToggle(_useClassesFirstRoundConfig.Value, "Enable Force classes first round", menu,
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _);
+            MenuHandler.CreateToggle(_forceClassesFirstRoundConfig.Value, "Enable Force classes first round", menu,
                 value => {
-                    _useClassesFirstRoundConfig.Value = value;
+                    _forceClassesFirstRoundConfig.Value = value;
                     OnHandShakeCompleted();
-                });
+                }
+            );
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
+            MenuHandler.CreateToggle(_allowMultiClassesConfig.Value, "Allow more than one class a game", menu,
+                value => {
+                    _allowMultiClassesConfig.Value = value;
+                    OnHandShakeCompleted();
+                }
+            );
         }
 
         private static void OnHandShakeCompleted() {
             if (PhotonNetwork.IsMasterClient) {
                 NetworkingManager.RPC_Others(typeof(EntryPoint), nameof(SyncSettings),
-                    new object[] {_useClassesFirstRoundConfig.Value});
+                    new [] {_forceClassesFirstRoundConfig.Value, _allowMultiClassesConfig.Value});
             }
         }
 
         [UnboundRPC]
         private static void SyncSettings(
-            bool hostUseClassesStart
+            bool hostForceClassesStart,
+            bool hostAllowMultiClasses
         ) {
-            _useClassesFirstRoundConfig.Value = hostUseClassesStart;
+            _forceClassesFirstRoundConfig.Value = hostForceClassesStart;
+            _allowMultiClassesConfig.Value = hostAllowMultiClasses;
         }
     }
 }
