@@ -16,12 +16,12 @@ namespace ClassesManager {
             }
         }
 
-        private Dictionary<string, CardCategory> _classUpgradeCategories;
+        private Dictionary<string, CardCategory> _classProgressionCategories;
         
-        public  Dictionary<string, CardCategory> ClassUpgradeCategories {
+        public  Dictionary<string, CardCategory> ClassProgressionCategories {
             get {
-                _classUpgradeCategories = _classUpgradeCategories ?? new Dictionary<string, CardCategory>();
-                return _classUpgradeCategories;
+                _classProgressionCategories = _classProgressionCategories ?? new Dictionary<string, CardCategory>();
+                return _classProgressionCategories;
             }
         }
 
@@ -43,7 +43,7 @@ namespace ClassesManager {
             }
         }
         
-        public void AddClassUpgradeCategories(
+        public void AddClassProgressionCategories(
             List<string> categoryNames
         ) {
             if (categoryNames.Count == 0) {
@@ -51,7 +51,7 @@ namespace ClassesManager {
             }
 
             foreach (var categoryName in categoryNames) {
-                ClassUpgradeCategories.Add(categoryName, CustomCardCategories.instance.CardCategory(categoryName));
+                ClassProgressionCategories.Add(categoryName, CustomCardCategories.instance.CardCategory(categoryName));
             }
         }
 
@@ -59,18 +59,18 @@ namespace ClassesManager {
             characterStats.GetAdditionalData().blacklistedCategories.Remove(DefaultCardCategory);
         }
         
-        public void RemoveUpgradeCategoriesFromPlayer(
+        public void RemoveProgressionCategoriesFromPlayer(
             CharacterStatModifiers characterStats,
-            List<string> upgradeCategoryNames
+            List<string> categoryNames
         ) {
-            if (upgradeCategoryNames.Count == 0) {
+            if (categoryNames.Count == 0) {
                 return;
             }
 
             var categoriesToRemove = new List<CardCategory>();
 
-            foreach (var upgradeCategoryName in upgradeCategoryNames) {
-                categoriesToRemove.Add(ClassUpgradeCategories[upgradeCategoryName]);
+            foreach (var progressionCategoryName in categoryNames) {
+                categoriesToRemove.Add(ClassProgressionCategories[progressionCategoryName]);
             }
 
             foreach (var category in categoriesToRemove) {
@@ -78,7 +78,7 @@ namespace ClassesManager {
             }
         }
 
-        public void AddClassCategoryToPlayersBlacklist(
+        public void AddClassCategoryToPlayer(
             CharacterStatModifiers characterStats
         ) {
             if (EntryPoint.AllowMultiClassesConfig.Value) {
@@ -88,10 +88,10 @@ namespace ClassesManager {
             characterStats.GetAdditionalData().blacklistedCategories.Add(ClassCategory);
         }
 
-        public void OnClassCardSelect(CharacterStatModifiers characterStats, List<string> upgradeCategoryNames) {
+        public void OnClassCardSelect(CharacterStatModifiers characterStats, List<string> progressionCategoryNames) {
             RemoveDefaultCardCategoryFromPlayer(characterStats);
-            AddClassCategoryToPlayersBlacklist(characterStats);
-            RemoveUpgradeCategoriesFromPlayer(characterStats, upgradeCategoryNames);
+            AddClassCategoryToPlayer(characterStats);
+            RemoveProgressionCategoriesFromPlayer(characterStats, progressionCategoryNames);
         }
     }
 }

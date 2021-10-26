@@ -75,7 +75,7 @@ namespace ClassesManager {
                 var currentCardsCategories = currentCard.categories.ToList();
 
                 if (currentCardsCategories.Contains(ClassesManager.Instance.DefaultCardCategory) ||
-                    currentCardsCategories.Contains(ClassesManager.Instance.ClassCategory) || ClassesManager.Instance.ClassUpgradeCategories.Values.Any(category =>
+                    currentCardsCategories.Contains(ClassesManager.Instance.ClassCategory) || ClassesManager.Instance.ClassProgressionCategories.Values.Any(category =>
                         currentCardsCategories.Contains(category))) {
                     continue;
                 }
@@ -100,7 +100,7 @@ namespace ClassesManager {
                     }
 
                     // blacklist all upgrade categories
-                    blackListCategory.AddRange(ClassesManager.Instance.ClassUpgradeCategories.Values.ToList());
+                    blackListCategory.AddRange(ClassesManager.Instance.ClassProgressionCategories.Values.ToList());
                 }
             }
 
