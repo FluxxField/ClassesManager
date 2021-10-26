@@ -27,7 +27,7 @@ namespace ClassesManager {
         private const string Version = "1.3.3";
 
         private static ConfigEntry<bool> _forceClassesFirstRoundConfig;
-        private static ConfigEntry<bool> _allowMultiClassesConfig;
+        internal static ConfigEntry<bool> AllowMultiClassesConfig;
 
         private static bool _isRoundOne = true;
 
@@ -53,7 +53,7 @@ namespace ClassesManager {
         private void Start() {
             _forceClassesFirstRoundConfig =
                 Config.Bind("Classes Manager", "Enabled", false, "Force classes only first round");
-            _allowMultiClassesConfig =
+            AllowMultiClassesConfig =
                 Config.Bind("Classes Manager", "Enabled", false, "Allow multiple classes per game");
             
             Unbound.Instance.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
@@ -125,9 +125,9 @@ namespace ClassesManager {
                 }
             );
             MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 30);
-            MenuHandler.CreateToggle(_allowMultiClassesConfig.Value, "Allow more than one class a game", menu,
+            MenuHandler.CreateToggle(AllowMultiClassesConfig.Value, "Allow more than one class a game", menu,
                 value => {
-                    _allowMultiClassesConfig.Value = value;
+                    AllowMultiClassesConfig.Value = value;
                     OnHandShakeCompleted();
                 }
             );
@@ -136,7 +136,7 @@ namespace ClassesManager {
         private static void OnHandShakeCompleted() {
             if (PhotonNetwork.IsMasterClient) {
                 NetworkingManager.RPC_Others(typeof(EntryPoint), nameof(SyncSettings),
-                    new [] {_forceClassesFirstRoundConfig.Value, _allowMultiClassesConfig.Value});
+                    new [] {_forceClassesFirstRoundConfig.Value, AllowMultiClassesConfig.Value});
             }
         }
 
@@ -146,7 +146,7 @@ namespace ClassesManager {
             bool hostAllowMultiClasses
         ) {
             _forceClassesFirstRoundConfig.Value = hostForceClassesStart;
-            _allowMultiClassesConfig.Value = hostAllowMultiClasses;
+            AllowMultiClassesConfig.Value = hostAllowMultiClasses;
         }
     }
 }

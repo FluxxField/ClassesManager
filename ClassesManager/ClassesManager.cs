@@ -81,6 +81,10 @@ namespace ClassesManager {
         public void AddClassCategoryToPlayersBlacklist(
             CharacterStatModifiers characterStats
         ) {
+            if (!EntryPoint.AllowMultiClassesConfig.Value) {
+                return;
+            }
+            
             characterStats.GetAdditionalData().blacklistedCategories.Add(ClassCategory);
         }
 
