@@ -52,9 +52,9 @@ namespace ClassesManager {
 
         private void Start() {
             _forceClassesFirstRoundConfig =
-                Config.Bind("Classes Manager", "Enabled", false, "Force classes only first round");
+                Config.Bind("Classes Manager", "ForceClassesFirstRound", false, "Force classes only first round");
             AllowMultiClassesConfig =
-                Config.Bind("Classes Manager", "Enabled", false, "Allow multiple classes per game");
+                Config.Bind("Classes Manager", "AllowMultiClasses", false, "Allow multiple classes per game");
             
             Unbound.Instance.ExecuteAfterSeconds(0.4f, BuildDefaultCategory);
 
